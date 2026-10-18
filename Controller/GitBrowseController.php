@@ -1,17 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace AstrX\Controller;
+namespace AstrX\GitBrowse\Controller;
 
-use AstrX\Api\ContextScope;
+use AstrX\Template\ContextScope;
 use AstrX\Auth\Gate;
 use AstrX\Auth\Permission;
 use AstrX\GitBrowse\GitBrowseConfig;
 use AstrX\I18n\Translator;
 use AstrX\Result\DiagnosticsCollector;
 use AstrX\Result\Result;
-use AstrX\Site\DefaultTemplateContext;
+use AstrX\Template\TemplateVars;
 use function AstrX\Support\langDir;
+use AstrX\Kernel\AbstractController;
 
 /**
  * Git browser link-through (/gitbrowse).
@@ -33,7 +34,7 @@ final class GitBrowseController extends AbstractController
 {
     public function __construct(
         DiagnosticsCollector                    $collector,
-        private readonly DefaultTemplateContext $ctx,
+        private readonly TemplateVars $ctx,
         private readonly Gate                   $gate,
         private readonly Translator             $t,
         private readonly GitBrowseConfig        $config,
