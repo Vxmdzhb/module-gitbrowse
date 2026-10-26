@@ -2,6 +2,8 @@
 
 Link-through page to a standalone gitweb instance — the **Git browser** module of [AstrX](https://github.com/Vxmdzhb/astrx).
 
+![The link to the git browser](docs/screenshot.png)
+
 - Module key: `gitbrowse` (switch it on in the site's `resources/config/Modules.config.php`)
 - Pages: `git_browse`
 - Requires: `astrx/cms`, `astrx/framework`, `astrx/library`
