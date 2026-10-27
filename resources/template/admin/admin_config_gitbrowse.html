@@ -1,0 +1,25 @@
+<h2>{{lbl_heading}}</h2>
+<p>{{lbl_intro}}</p>
+
+<p><strong>{{lbl_status}}:</strong>
+    {{#status_ok}}<span class="diag-notice">{{status_text}}</span>{{/status_ok}}
+    {{^status_ok}}<span class="diag-error">{{status_text}}</span>{{/status_ok}}</p>
+
+<form method="POST">
+    <input type="hidden" name="prg_id" value="{{prg_id}}">
+    <input type="hidden" name="_csrf"  value="{{csrf_token}}">
+    <table>
+        <tr><th>{{lbl_api_url}}</th>
+            <td><input type="text" name="api_url" value="{{cfg_api_url}}" size="40" class="input"><br><small>{{lbl_api_url_hint}}</small></td></tr>
+        <tr><th>{{lbl_public_url}}</th>
+            <td><input type="text" name="public_url" value="{{cfg_public_url}}" size="40" class="input"><br><small>{{lbl_public_url_hint}}</small></td></tr>
+        <tr><th colspan="2">{{lbl_auth}} <small>({{lbl_auth_hint}})</small></th></tr>
+        <tr><th>{{lbl_auth_user}}</th>
+            <td><input type="text" name="auth_user" value="{{cfg_auth_user}}" autocomplete="off" class="input"></td></tr>
+        <tr><th>{{lbl_auth_password}}</th>
+            <td><input type="password" name="auth_password" value="" autocomplete="new-password" class="input">{{#cfg_has_password}}<br><small>{{lbl_password_keep}}</small>{{/cfg_has_password}}</td></tr>
+        <tr><th>{{lbl_timeout}}</th>
+            <td><input type="number" name="timeout_seconds" value="{{cfg_timeout}}" min="1" max="10" class="input"> s</td></tr>
+        <tr><td colspan="2"><input type="submit" value="{{lbl_save}}" class="input"></td></tr>
+    </table>
+</form>

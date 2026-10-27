@@ -6,15 +6,15 @@ namespace AstrX\GitBrowse;
 use AstrX\Module\Module;
 
 /**
- * Git browser link-through module (the /gitbrowse page). gitweb is a
- * standalone, server-rendered HTML app with NO JSON API, so this module never
- * reimplements or proxies it — the page is a single card that links OUT to the
- * configured gitweb service URL. It owns no database tables and makes no backend
- * calls.
+ * The git browser (the /gitbrowse page): the repositories on a gitweb server,
+ * read through gitweb's JSON API and shown in the site's layout — the
+ * repository list, files and READMEs, code with line numbers, the history and
+ * each commit's diff. Admin → Git server says which server and how visitors
+ * clone from it. It owns no database tables.
  *
- * No nav contributor or guard needed: its navbar entry is a DB row that
+ * No nav contributor or guard needed: its navbar entries are DB rows that
  * NavbarHandler drops when the module is off (via page.module), and the core
- * ModulePageGuard 404s its page. See {@see \AstrX\Module\ModuleRegistry}.
+ * ModulePageGuard 404s its pages. See {@see \AstrX\Module\ModuleRegistry}.
  */
 final class GitBrowseModule implements Module
 {
@@ -31,6 +31,7 @@ final class GitBrowseModule implements Module
             // Page file_name => controller. Resolved by Site\ControllerMap.
             'controllers'  => [
                 'git_browse' => \AstrX\GitBrowse\Controller\GitBrowseController::class,
+                'admin_config_gitbrowse' => \AstrX\GitBrowse\Controller\AdminConfigGitBrowseController::class,
             ],
             'teardown'     => 'gitbrowse.down.sql',
             // Templates, translations and default config (see docs/MODULES.md).

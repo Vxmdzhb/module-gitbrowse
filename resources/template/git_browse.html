@@ -1,26 +1,161 @@
 <div id="git_browse">
     <style>
-    /* Self-contained, mirroring web_search.html: transparent fills,
-       currentColor borders, px spacing, no rem/em, no border-radius. */
-    #git_browse{--gb-border:currentColor;background:transparent;color:inherit;}
-    #git_browse a{text-decoration:none;color:inherit;}
+    /* Self-contained: transparent fills, currentColor borders, px spacing, no
+       rem/em, no border-radius. The accents match the search pages: links and
+       names blue, facts green; diffs use green and red for added and removed
+       lines. Code is monospace and keeps its whitespace. */
+    #git_browse{--gb-border:currentColor;--gb-accent:#5b9bff;--gb-meta:#54b054;--gb-dir:#c9a227;--gb-add:#54b054;--gb-del:#e0605a;background:transparent;color:inherit;}
+    #git_browse a{text-decoration:none;color:var(--gb-accent);}
     #git_browse a:hover{text-decoration:underline;}
-    .search-header{border-bottom:1px solid var(--gb-border);margin-bottom:8px;padding-bottom:5px;}
-    .search-header h1{margin:3px 0;}
-    .search-intro{font-style:italic;margin:4px 0 8px;}
-    .gb-card{border:1px solid var(--gb-border);background:transparent;padding:12px;margin:8px 0;}
-    .gb-card .gb-open{display:inline-block;border:1px solid var(--gb-border);padding:3px 14px;margin:4px 0;}
-    .gb-card .gb-url{display:block;font-size:12px;opacity:.8;word-wrap:break-word;margin-top:4px;}
-    .gb-note{font-size:12px;opacity:.7;margin:8px 0;}
+    .gb-header{border-bottom:1px solid var(--gb-border);margin-bottom:8px;padding-bottom:5px;}
+    .gb-header h1{margin:3px 0;}
+    #git_browse .gb-header h1 a{color:inherit;}
+    /* The theme lays every table out with table-layout:fixed and wraps every
+       cell, so columns get explicit widths here, and code is not a table. */
+    .gb-intro,.gb-empty,.gb-unavailable{font-style:italic;margin:6px 0;}
+    .gb-repos{width:100%;border-collapse:collapse;}
+    .gb-repos th{text-align:left;border-bottom:1px solid var(--gb-border);padding:3px 8px 3px 0;}
+    .gb-repos td{padding:5px 8px 5px 0;border-bottom:1px dashed var(--gb-border);vertical-align:top;}
+    .gb-repos td.gb-name a{font-weight:bold;font-size:1.05em;}
+    .gb-repos th.gb-name{width:24%;}
+    .gb-repos th.gb-when{width:9em;}
+    .gb-repos td.gb-when{color:var(--gb-meta);font-size:12px;}
+    .gb-repo-title{margin:2px 0;font-size:1.4em;}
+    .gb-repo-title a{font-weight:bold;}
+    .gb-desc{margin:2px 0 6px;font-style:italic;}
+    .gb-stats{font-size:12px;color:var(--gb-meta);margin:4px 0;}
+    .gb-tabs{display:flex;flex-wrap:wrap;margin:8px 0;border-bottom:1px solid var(--gb-border);}
+    .gb-tabs a{border:1px solid var(--gb-border);border-bottom:none;padding:3px 14px;margin-right:4px;}
+    #git_browse .gb-tabs a.active{border-color:var(--gb-accent);font-weight:bold;}
+    .gb-branches{font-size:12px;margin:4px 0;}
+    .gb-branches a{border:1px solid var(--gb-border);padding:0 6px;margin-right:4px;}
+    #git_browse .gb-branches a.active{border-color:var(--gb-accent);font-weight:bold;}
+    .gb-clone{font-family:monospace;font-size:12px;border:1px dashed var(--gb-border);padding:3px 6px;margin:6px 0;word-break:break-all;}
+    .gb-latest{font-size:13px;border:1px solid var(--gb-border);padding:4px 8px;margin:6px 0;}
+    .gb-latest .gb-sha{font-family:monospace;}
+    .gb-latest .gb-when{color:var(--gb-meta);font-size:12px;}
+    .gb-crumbs{margin:8px 0 4px;font-family:monospace;}
+    .gb-crumbs a{font-weight:bold;}
+    .gb-files{width:100%;border-collapse:collapse;font-family:monospace;font-size:13px;border:1px solid var(--gb-border);}
+    .gb-files td{padding:3px 8px;border-bottom:1px dotted var(--gb-border);}
+    .gb-files tr.dir td.gb-file a{color:var(--gb-dir);font-weight:bold;}
+    .gb-files tr.dir td.gb-file:before{content:"\25B8 ";color:var(--gb-dir);}
+    .gb-files tr.file td.gb-file:before,.gb-files tr.sub td.gb-file:before{content:"\00B7  ";opacity:.6;}
+    .gb-files td.gb-size{text-align:right;color:var(--gb-meta);width:7em;}
+    .gb-readme{border:1px solid var(--gb-border);margin:10px 0;}
+    .gb-readme-name{border-bottom:1px solid var(--gb-border);padding:3px 8px;font-weight:bold;font-family:monospace;}
+    .gb-readme pre{margin:0;padding:8px;white-space:pre-wrap;word-wrap:break-word;}
+    .gb-fileinfo{font-size:12px;color:var(--gb-meta);margin:4px 0;}
+    .gb-code{font-family:monospace;font-size:13px;border:1px solid var(--gb-border);padding:4px 0;overflow-x:auto;}
+    .gb-code div{display:flex;line-height:1.35;}
+    .gb-code .gb-ln{flex:0 0 3.5em;text-align:right;padding-right:10px;opacity:.5;user-select:none;border-right:1px solid var(--gb-border);}
+    .gb-code .gb-src{flex:1 1 auto;padding-left:10px;white-space:pre-wrap;word-break:break-all;min-width:0;}
+    .gb-commits{width:100%;border-collapse:collapse;font-size:13px;}
+    .gb-commits td{padding:4px 8px 4px 0;border-bottom:1px dashed var(--gb-border);vertical-align:top;}
+    .gb-commits td.gb-sha{font-family:monospace;width:5.5em;}
+    .gb-commits td.gb-who{width:9em;}
+    .gb-commits td.gb-when{width:8.5em;}
+    .gb-commits td.gb-when,.gb-commits td.gb-who{color:var(--gb-meta);font-size:12px;}
+    .gb-pager{margin:10px 0;display:flex;gap:14px;}
+    .gb-pager a{border:1px solid var(--gb-accent);padding:2px 10px;}
+    .gb-commit h2{margin:6px 0;}
+    .gb-commit-body{white-space:pre-wrap;margin:6px 0;}
+    .gb-commit-info{border-collapse:collapse;font-size:13px;margin:6px 0;}
+    .gb-commit-info{width:auto;}
+    .gb-commit-info th{text-align:left;padding:1px 14px 1px 0;font-weight:normal;opacity:.8;width:7em;}
+    .gb-commit-info td{font-family:monospace;color:var(--gb-meta);}
+    .gb-signed{border:1px solid var(--gb-add);color:var(--gb-add);padding:0 6px;font-size:11px;margin-left:6px;}
+    .gb-diff{font-family:monospace;font-size:12px;border:1px solid var(--gb-border);padding:4px 0;margin:8px 0;}
+    .gb-diff div{white-space:pre-wrap;word-break:break-all;padding:0 8px;min-height:1.2em;}
+    .gb-diff .d-file{font-weight:bold;border-top:1px solid var(--gb-border);margin-top:4px;padding-top:4px;}
+    .gb-diff .d-meta{opacity:.7;}
+    .gb-diff .d-hunk{color:var(--gb-accent);}
+    .gb-diff .d-add{color:var(--gb-add);}
+    .gb-diff .d-del{color:var(--gb-del);}
     </style>
 
-    <div class="search-header"><h1>{{lbl_heading}}</h1></div>
-    <p class="search-intro">{{lbl_intro}}</p>
+    <div class="gb-header"><h1><a href="{{home_url}}">{{lbl_heading}}</a></h1></div>
 
-    <div class="gb-card">
-        <a class="gb-open" href="{{service_url}}" rel="noopener noreferrer nofollow" target="_blank">{{lbl_open}}</a>
-        <cite class="gb-url">{{service_url}}</cite>
+    {{#view_unavailable}}<p class="gb-unavailable">{{lbl_unavailable}}</p>{{/view_unavailable}}
+    {{#view_not_found}}<p class="gb-empty">{{lbl_not_found}}</p>{{/view_not_found}}
+
+    {{! ── the repositories ── }}
+    {{#view_list}}
+    <p class="gb-intro">{{lbl_intro}}</p>
+    {{^has_repos}}<p class="gb-empty">{{lbl_no_repos}}</p>{{/has_repos}}
+    {{#has_repos}}
+    <table class="gb-repos">
+        <tr><th class="gb-name">{{lbl_repository}}</th><th>{{lbl_description}}</th><th class="gb-when">{{lbl_updated}}</th></tr>
+        {{#repos}}<tr><td class="gb-name"><a href="{{url}}">{{name}}</a></td><td>{{description}}</td><td class="gb-when">{{updated}}</td></tr>{{/repos}}
+    </table>
+    {{/has_repos}}
+    {{/view_list}}
+
+    {{! ── a repository's header ── }}
+    {{#in_repo}}
+    <div class="gb-repo-title"><a href="{{repo_url}}">{{repo_name}}</a></div>
+    <p class="gb-desc">{{repo_description}}</p>
+    <p class="gb-stats">{{commit_count}} {{lbl_commits}} &middot; {{branch_count}} {{lbl_branch_count}} &middot; {{tag_count}} {{lbl_tags}}</p>
+    {{#has_clone}}<div class="gb-clone">{{clone_cmd}}</div>{{/has_clone}}
+    <nav class="gb-tabs">
+        <a href="{{code_url}}"{{#tab_code}} class="active"{{/tab_code}}>{{lbl_code}}</a>
+        <a href="{{log_url}}"{{#tab_log}} class="active"{{/tab_log}}>{{lbl_log}}</a>
+    </nav>
+    <div class="gb-branches">{{lbl_branches}}: {{#branches}}<a href="{{url}}"{{#active}} class="active"{{/active}}>{{name}}</a>{{/branches}}</div>
+    {{/in_repo}}
+
+    {{! ── a directory ── }}
+    {{#view_tree}}
+    {{#latest}}<div class="gb-latest">{{lbl_latest}}: <a class="gb-sha" href="{{url}}">{{short}}</a> {{subject}} <span class="gb-when">&middot; {{author}} &middot; {{date}}</span></div>{{/latest}}
+    <div class="gb-crumbs">{{#crumbs}}<a href="{{url}}">{{name}}</a> / {{/crumbs}}</div>
+    <table class="gb-files">
+        {{#entries}}<tr class="{{cls}}"><td class="gb-file"><a href="{{url}}">{{name}}</a></td><td class="gb-size">{{size}}</td></tr>{{/entries}}
+    </table>
+    {{#tree_truncated}}<p class="gb-empty">{{lbl_tree_truncated}}</p>{{/tree_truncated}}
+    {{#has_readme}}
+    <div class="gb-readme">
+        <div class="gb-readme-name">{{readme_name}}</div>
+        <pre>{{readme}}</pre>
     </div>
+    {{/has_readme}}
+    {{/view_tree}}
 
-    <p class="gb-note">{{lbl_note}}</p>
+    {{! ── a file ── }}
+    {{#view_blob}}
+    <div class="gb-crumbs">{{#crumbs}}<a href="{{url}}">{{name}}</a> / {{/crumbs}}</div>
+    <p class="gb-fileinfo">{{file_size}} &middot; {{file_lines}} {{lbl_lines}}</p>
+    {{#is_binary}}<p class="gb-empty">{{lbl_binary}}</p>{{/is_binary}}
+    {{^is_binary}}
+    <div class="gb-code">{{#lines}}<div><span class="gb-ln">{{n}}</span><span class="gb-src">{{text}}</span></div>{{/lines}}</div>
+    {{#file_truncated}}<p class="gb-empty">{{lbl_truncated}}</p>{{/file_truncated}}
+    {{/is_binary}}
+    {{/view_blob}}
+
+    {{! ── the history ── }}
+    {{#view_log}}
+    <table class="gb-commits">
+        {{#commits}}<tr><td class="gb-sha"><a href="{{url}}">{{short}}</a></td><td>{{subject}}</td><td class="gb-who">{{author}}</td><td class="gb-when">{{date}}</td></tr>{{/commits}}
+    </table>
+    <nav class="gb-pager">
+        {{#has_prev}}<a href="{{prev_url}}">&larr; {{lbl_prev}}</a>{{/has_prev}}
+        {{#has_next}}<a href="{{next_url}}">{{lbl_next}} &rarr;</a>{{/has_next}}
+    </nav>
+    {{/view_log}}
+
+    {{! ── one commit ── }}
+    {{#view_commit}}
+    <div class="gb-commit">
+        <h2>{{c_subject}}{{#c_signed}}<span class="gb-signed">{{lbl_signed}}</span>{{/c_signed}}</h2>
+        {{#c_has_body}}<div class="gb-commit-body">{{c_body}}</div>{{/c_has_body}}
+        <table class="gb-commit-info">
+            <tr><th>{{lbl_author}}</th><td>{{c_author}}</td></tr>
+            <tr><th>{{lbl_date}}</th><td>{{c_date}}</td></tr>
+            <tr><th>commit</th><td>{{c_sha}}</td></tr>
+            <tr><th>{{lbl_parents}}</th><td>{{#c_parents}}<a href="{{url}}">{{short}}</a> {{/c_parents}}</td></tr>
+        </table>
+        <p><a href="{{c_tree_url}}">{{lbl_browse_tree}}</a></p>
+        <div class="gb-diff">{{#diff_lines}}<div class="{{cls}}">{{text}}</div>{{/diff_lines}}</div>
+        {{#diff_truncated}}<p class="gb-empty">{{lbl_truncated}}</p>{{/diff_truncated}}
+    </div>
+    {{/view_commit}}
 </div>

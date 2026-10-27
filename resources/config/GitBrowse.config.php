@@ -2,19 +2,20 @@
 declare(strict_types=1);
 
 /**
- * Git browser link-through — config. The section key 'GitBrowseConfig' matches
- * the holder's short class name; there is no GitBrowseConfig.config.php, so
- * ModuleLoader falls back to this file (named after the parent namespace segment
- * 'GitBrowse'), exactly like BotTrapConfig → BotTrap.config.php.
+ * Git browser — the git server it reads (see GitBrowseConfig). The admin page
+ * Git server writes the site's copy of this file; any key there overrides
+ * this default.
  *
- * service_url is the user-facing address of the standalone gitweb HTML app that
- * this page links out to. gitweb has no JSON API, so AstrX never fetches it —
- * this value only ever becomes the href of a link. Set it to wherever visitors
- * can actually reach gitweb (its loopback default here, or a public/onion URL if
- * you expose it). A non-http(s) value is rejected to the localhost default.
+ * api_url is an address the SITE reaches (gitweb's JSON API); public_url is
+ * the same server as VISITORS reach it, used for `git clone`. Only http(s)
+ * addresses are accepted; anything else falls back to the default.
  */
 return [
     'GitBrowseConfig' => [
-        'service_url' => 'http://127.0.0.1:8801', // gitweb service (user-facing link target)
+        'api_url'         => 'http://127.0.0.1:8801',
+        'public_url'      => '',
+        'auth_user'       => '',
+        'auth_password'   => '',
+        'timeout_seconds' => 3,
     ],
 ];

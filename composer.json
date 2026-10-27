@@ -1,6 +1,6 @@
 {
     "name": "astrx/module-gitbrowse",
-    "description": "Link-through page to a standalone gitweb instance",
+    "description": "Browse git repositories inside the site: files, code, history and commits",
     "type": "astrx-module",
     "keywords": [
         "astrx",
