@@ -1,6 +1,7 @@
 {
     "name": "astrx/module-gitbrowse",
     "description": "Browse git repositories inside the site: files, code, history and commits",
+    "license": "LicenseRef-DoWhatever",
     "type": "astrx-module",
     "keywords": [
         "astrx",
