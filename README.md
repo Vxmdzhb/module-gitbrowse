@@ -6,7 +6,7 @@ Browse git repositories inside the site: files, code, history and commits — th
 
 - Module key: `gitbrowse` (switch it on in the site's `resources/config/Modules.config.php`)
 - Pages: `git_browse`, `admin_config_gitbrowse`
-- Requires: `astrx/cms`, `astrx/framework`, `astrx/library`
+- Requires: `astrx/auth`, `astrx/cms`, `astrx/config`, `astrx/csrf`, `astrx/http`, `astrx/i18n`, `astrx/kernel`, `astrx/module`, `astrx/result`, `astrx/routing`, `astrx/session`, `astrx/template`
 
 The Code page lists the repositories of a git server and lets visitors walk
 through them without leaving the site, in the site's theme and without
@@ -48,9 +48,27 @@ Composer where to find the package and the AstrX packages it depends on:
     "prefer-stable": true,
     "repositories": [
         { "type": "vcs", "url": "https://github.com/Vxmdzhb/module-gitbrowse" },
-        { "type": "vcs", "url": "https://github.com/Vxmdzhb/cms" },
-        { "type": "vcs", "url": "https://github.com/Vxmdzhb/framework" },
-        { "type": "vcs", "url": "https://github.com/Vxmdzhb/library" }
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/result" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/support" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/config" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/auth" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/api" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/http" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/i18n" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/session" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/kernel" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/routing" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/template" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/captcha" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/csrf" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/error-handler" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/identicon" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/image" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/mail" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/injector" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/module" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/pagination" },
+        { "type": "vcs", "url": "https://github.com/Vxmdzhb/cms" }
     ]
 }
 ```
